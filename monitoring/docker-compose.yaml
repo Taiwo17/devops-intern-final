@@ -1,0 +1,2 @@
+# TODO: Define Loki, Promtail and Grafana services.
+# Pin image versions and mount the committed configuration files.

@@ -1,0 +1,3 @@
+# TODO: Configure push and pull_request triggers for main.
+# Required jobs: lint, build, test and publish.
+# Pin third-party actions and use least-privilege GITHUB_TOKEN permissions.
