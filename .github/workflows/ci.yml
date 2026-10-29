@@ -1,3 +1,173 @@
-# TODO: Configure push and pull_request triggers for main.
 # Required jobs: lint, build, test and publish.
 # Pin third-party actions and use least-privilege GITHUB_TOKEN permissions.
+
+name: Develop CI/CD pipeline
+
+on:
+    push:
+        branches:
+            - main
+            - "feature/**"
+    pull_request:
+        branches:
+            - main
+
+permissions:
+    contents: read
+
+jobs:
+    lint:
+        name: Lint Script and Dockerfile
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+
+            - name: Run Shellcheck
+              run: |
+                  sudo apt-get update
+                  sudo apt-get install -y shellcheck
+                  shellcheck scripts/sysinfo.sh scripts/healthcheck.sh
+
+            - name: Run Hadolint
+              uses: hadolint/hadolint-action@v3.1.0
+              with:
+                  dockerfile: app/Dockerfile
+
+    build:
+        name: Build docker image
+        runs-on: ubuntu-latest
+        needs: lint
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+
+            - name: Build Docker Image
+              run: |
+                  docker build \
+                    -f app/Dockerfile \
+                    --build-arg BUILD_SHA=${GITHUB_SHA} \
+                    -t devops-intern-final:${GITHUB_SHA} .
+
+            - name: Display image size
+              run: docker images devops-intern-final:${GITHUB_SHA}
+
+            - name: Display and verify image size
+              run: |
+                  docker images devops-intern-final:${GITHUB_SHA}
+                  IMAGE_SIZE=$(docker image inspect \
+                    devops-intern-final:${GITHUB_SHA} \
+                    --format='{{.Size}}')
+                  MAX_SIZE=$((60 * 1024 * 1024))
+
+                  echo "Image size: $IMAGE_SIZE bytes"
+                  if [ "$IMAGE_SIZE" -ge "$MAX_SIZE" ]; then
+                    echo "ERROR: Image must be smaller than 60 MiB."
+                    exit 1
+                  fi
+
+    test:
+        name: Test Application
+        runs-on: ubuntu-latest
+        needs: build
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+
+            - name: Build test image
+              run: |
+                  docker build \
+                  -f app/Dockerfile \
+                  --build-arg BUILD_SHA="${GITHUB_SHA}" \
+                  -t devops-intern-final:test .
+
+            - name: Start application
+              run: |
+                  docker run -d \
+                  --name devops-nginx-test \
+                  -p 8080:8080 \
+                  devops-intern-final:test
+
+            - name: Wait for application health
+              run: |
+                  for attempt in $(seq 1 15); do
+                    if curl --fail --silent http://127.0.0.1:8080/healthz; then
+                        echo "Application health endpoint is ready"
+                        exit 0
+                    fi
+                    sleep 2
+                   done
+
+                   echo "Application failed to become healthy"
+                   docker logs devops-nginx-test
+                   exit 1
+
+            - name: Run health-check script
+              run: bash scripts/healthcheck.sh http://127.0.0.1:8080/healthz
+
+            - name: Verify build identifier
+              run: |
+                  curl --fail --silent http://127.0.0.1:8080/ \
+                      | grep -F "${GITHUB_SHA}"
+
+            - name: Verify missing path return 404
+              run: |
+                  status=$(curl --silent --output /dev/null \
+                    --write-out '%{http_code}' \
+                    http://127.0.0.1:8080/does-not-exist)
+
+                  test "$status" = "404"
+
+            - name: Show container log on failure
+              if: failure()
+              run: docker logs devops-nginx-test || true
+
+            - name: Clean up test container
+              if: always()
+              run: docker rm -f devops-nginx-test || true
+
+    publish:
+        name: Publish Image to GHCR
+        runs-on: ubuntu-latest
+        needs:
+            - lint
+            - build
+            - test
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+        # env:
+        #     IMAGE_NAME: ghcr.io/${{ github.repository }}
+
+        permissions:
+            contents: read
+            packages: write
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+
+            - name: Set lowercase image case
+              run: |
+                  echo "IMAGE_NAME=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_ENV"
+
+            - name: Log in to GitHub Container Registry
+              uses: docker/login-action@v3
+              with:
+                  registry: ghcr.io
+                  username: ${{ github.actor }}
+                  password: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: Build and publish image
+              uses: docker/build-push-action@v6
+              with:
+                  context: .
+                  file: app/Dockerfile
+                  push: true
+                  build-args: |
+                      BUILD_SHA=${{ github.sha }}
+                  tags: |
+                      ${{ env.IMAGE_NAME }}:${{ github.sha }}
+                      ${{ env.IMAGE_NAME }}:latest
