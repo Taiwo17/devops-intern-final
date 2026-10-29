@@ -138,8 +138,8 @@ jobs:
             - test
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
 
-        # env:
-        #     IMAGE_NAME: ghcr.io/${{ github.repository }}
+        env:
+            IMAGE_NAME: ghcr.io/${{ github.repository }}
 
         permissions:
             contents: read
