@@ -5,29 +5,29 @@
 A containerized NGINX web application demonstrating Linux administration, Bash scripting, Docker, Git/GitHub collaboration, continuous integration and delivery, Nomad deployment, and centralized logging with Loki, Promtail, and Grafana.
 
 **Author:** Taiwo Shobo  
-**Assessment date:** 29 October 2026  
+**Assessment date:** 30 October 2026
 **Repository:** [Taiwo17/devops-intern-final](https://github.com/Taiwo17/devops-intern-final)
 
 ---
 
 ## Table of Contents
 
-- [1. Project Overview](#1-project-overview)
-- [2. Repository Structure](#2-repository-structure)
-- [3. Prerequisites](#3-prerequisites)
-- [4. Task 1 — Repository Setup and Git Workflow](#4-task-1--repository-setup-and-git-workflow)
-- [5. Task 2 — Bash Automation Scripts](#5-task-2--bash-automation-scripts)
-- [6. Task 3 — Docker Containerization](#6-task-3--docker-containerization)
-- [7. Task 4 — GitHub Actions CI/CD](#7-task-4--github-actions-cicd)
-- [8. Task 5 — Nomad Deployment](#8-task-5--nomad-deployment)
-- [9. Task 6 — Centralized Logging and Monitoring](#9-task-6--centralized-logging-and-monitoring)
-- [10. Architecture](#10-architecture)
-- [11. Quick Start](#11-quick-start)
-- [12. Testing and Validation](#12-testing-and-validation)
-- [13. Screenshots and Evidence](#13-screenshots-and-evidence)
-- [14. Troubleshooting](#14-troubleshooting)
-- [15. Limitations and Future Improvements](#15-limitations-and-future-improvements)
-- [16. Assessment Status](#16-assessment-status)
+1. [Project Overview](#1-project-overview)
+2. [Repository Structure](#2-repository-structure)
+3. [Prerequisites](#3-prerequisites)
+4. [Task 1 — Repository Setup and Git Workflow](#4-task-1--repository-setup-and-git-workflow)
+5. [Task 2 — Bash Automation Scripts](#5-task-2--bash-automation-scripts)
+6. [Task 3 — Docker Containerization](#6-task-3--docker-containerization)
+7. [Task 4 — GitHub Actions CI/CD](#7-task-4--github-actions-cicd)
+8. [Task 5 — Nomad Deployment](#8-task-5--nomad-deployment)
+9. [Task 6 — Centralized Logging and Monitoring](#9-task-6--centralized-logging-and-monitoring)
+10. [Architecture](#10-architecture)
+11. [Quick Start](#11-quick-start)
+12. [Testing and Validation](#12-testing-and-validation)
+13. [Screenshots and Evidence](#13-screenshots-and-evidence)
+14. [Troubleshooting](#14-troubleshooting)
+15. [Limitations and Future Improvements](#15-limitations-and-future-improvements)
+16. [Assessment Status](#16-assessment-status)
 
 ---
 
@@ -35,7 +35,7 @@ A containerized NGINX web application demonstrating Linux administration, Bash s
 
 The objective of this project is to build and document an end-to-end deployment pipeline for a lightweight NGINX web application.
 
-The project combines Linux command-line administration, automated health checks, container security, Git-based version control, CI/CD, orchestration, and centralized log analysis.
+The project combines Linux command-line administration, automated health checks, container security, Git-based version control, CI/CD, workload orchestration, and centralized log analysis.
 
 ### Objectives
 
@@ -45,13 +45,13 @@ The project combines Linux command-line administration, automated health checks,
 - Expose the application on port `8080` and provide a `/healthz` endpoint.
 - Embed a build identifier in the application.
 - Automate linting, building, testing, and publishing through GitHub Actions.
-- Define and validate an NGINX workload using HashiCorp Nomad.
+- Define and deploy an NGINX workload using HashiCorp Nomad.
 - Collect and query logs using Loki, Promtail, and Grafana.
 - Document implementation decisions, testing evidence, troubleshooting, and limitations.
 
 ## 2. Repository Structure
 
-The intended repository structure is:
+The project uses the following directory structure:
 
 ```text
 devops-intern-final/
@@ -76,32 +76,35 @@ devops-intern-final/
 │   └── loki_setup.md
 └── docs/
     └── screenshots/
+        ├── grafana-404-logs.png-1.png
+        └── grafana-404-logs.png.png
 ```
 
-The `docs/screenshots/` directory is used to store assessment evidence, such as successful builds, health checks, workflow runs, Nomad status, and Grafana queries.
+The `docs/screenshots/` directory contains assessment evidence, including Grafana log-monitoring results.
 
 ## 3. Prerequisites
 
-The following tools are required for the relevant parts of the project:
+The following tools are required for the relevant parts of the project.
 
-| Tool | Purpose |
-|---|---|
-| Git | Version control and collaboration workflow |
-| GitHub account | Source code hosting and GitHub Actions |
-| Bash | Automation scripts |
-| ShellCheck | Bash script linting |
-| Docker Engine or Docker Desktop | Build and run the container |
-| curl | HTTP health-check testing |
-| Hadolint | Dockerfile linting |
-| HashiCorp Nomad | Workload validation and orchestration |
-| Docker Compose | Run the monitoring services |
-| Loki | Log aggregation |
-| Promtail | Log collection and forwarding |
-| Grafana | Log exploration and visualization |
+| Tool            | Purpose                                |
+| --------------- | -------------------------------------- |
+| Git             | Version control                        |
+| GitHub account  | Source code hosting and GitHub Actions |
+| Bash            | Automation scripts                     |
+| ShellCheck      | Bash script linting                    |
+| Hadolint        | Dockerfile linting                     |
+| Docker Engine   | Build and run containers               |
+| Docker Compose  | Run monitoring services                |
+| curl            | HTTP testing                           |
+| HashiCorp Nomad | Workload orchestration                 |
+| Consul          | Service registration and health checks |
+| Loki            | Log aggregation                        |
+| Promtail        | Log collection and forwarding          |
+| Grafana         | Log exploration and visualization      |
 
-The Bash scripts and Docker application have been tested in a WSL 2 Ubuntu environment with Docker available through Docker Desktop.
+The application and Bash scripts were tested in a WSL 2 Ubuntu environment with Docker available through Docker Desktop.
 
-Check installed tools:
+Check the installed tools:
 
 ```bash
 git --version
@@ -112,19 +115,20 @@ curl --version
 shellcheck --version
 ```
 
-Check Nomad separately when working on the deployment task:
+Check Nomad and Consul when working on the orchestration task:
 
 ```bash
 nomad version
+consul version
 ```
 
-Install any missing tools before running the relevant task.
+Install missing tools before running the corresponding task.
 
 ## 4. Task 1 — Repository Setup and Git Workflow
 
 ### Objective
 
-Create the public GitHub repository, establish the required directory structure, and use a feature branch for implementation.
+Create a public GitHub repository, establish the required project structure, and use feature branches for implementation.
 
 ### Repository
 
@@ -132,31 +136,32 @@ Create the public GitHub repository, establish the required directory structure,
 
 ### Branching strategy
 
-The implementation branch is:
+The project uses `main` as its integration branch and feature branches for implementation.
+
+The GitHub Actions implementation was developed on:
 
 ```text
-feature/project-scaffold
+feature/github-actions-ci
 ```
 
-The target integration branch is:
+A pull request was opened, reviewed, and merged into `main`.
 
-```text
-main
-```
+### Git workflow
 
-The intended workflow is:
+The workflow followed for implementation is:
 
 1. Create the repository and project structure.
-2. Work on `feature/project-scaffold` rather than making implementation changes directly on `main`.
-3. Commit related changes in small, meaningful units.
+2. Create a feature branch for the required changes.
+3. Commit related changes using meaningful commit messages.
 4. Push the feature branch to GitHub.
 5. Open a pull request targeting `main`.
 6. Review and merge the pull request.
-7. Create the final release tag `v1.0.0` after the required tasks have been completed and verified.
+7. Verify the final implementation on `main`.
+8. Create the release tag `v1.0.0` after final verification.
 
 ### Conventional commits
 
-Commit messages describe the purpose of each change.
+Commit messages follow the Conventional Commits style.
 
 Examples:
 
@@ -180,7 +185,14 @@ git status
 git log --oneline --decorate -5
 ```
 
-Before the final submission, verify that the required pull request has been merged into `main` and that the `v1.0.0` tag exists.
+Verify the merged implementation is present on `main`:
+
+```bash
+git switch main
+git pull origin main
+```
+
+The final release tag is to be created after all assessment documentation and evidence have been verified.
 
 ## 5. Task 2 — Bash Automation Scripts
 
@@ -188,13 +200,13 @@ Before the final submission, verify that the required pull request has been merg
 
 **File:** `scripts/sysinfo.sh`
 
-The system information script reports useful information about the environment in which it runs.
+The system information script reports useful details about the environment in which it runs.
 
-It includes:
+It reports:
 
 - Current username and effective user ID.
 - Hostname and kernel release.
-- Current date and time in ISO 8601 UTC format.
+- Current date and time in ISO 8601 format.
 - Disk usage.
 - Memory usage.
 - Docker daemon availability.
@@ -206,36 +218,15 @@ The script uses a Bash shebang and strict error-handling options:
 set -euo pipefail
 ```
 
-Run it from the repository root:
+Run the script from the repository root:
 
 ```bash
 bash scripts/sysinfo.sh
 ```
 
-Expected output sections include:
+The output includes sections for user information, host information, system date, disk usage, memory usage, and Docker daemon status.
 
-```text
-=== User ===
-Current user: ...
-
-=== Host ===
-Hostname: ...
-Kernel release: ...
-
-=== System Date ===
-Date (UTC): ...
-
-=== Disk Usage ===
-...
-
-=== Memory Usage ===
-...
-
-=== Docker Daemon ===
-Docker status: running
-```
-
-The values depend on the machine running the script.
+The actual values depend on the machine running the script.
 
 ### 5.2 Application health-check script
 
@@ -243,7 +234,7 @@ The values depend on the machine running the script.
 
 The health-check script checks whether an HTTP endpoint returns status code `200`.
 
-The target URL is optional. If no URL is supplied, the script uses:
+The target URL is optional. If no URL is supplied, the default is:
 
 ```text
 http://localhost:8080
@@ -275,15 +266,15 @@ bash scripts/healthcheck.sh http://localhost:9999/healthz
 
 ### Health-check behavior
 
-| Condition | Expected result |
-|---|---|
-| HTTP `200` | Exit code `0` |
-| HTTP `404` or another non-200 response | Nonzero exit code |
-| Connection failure or timeout | Nonzero exit code |
-| More than one URL argument | Nonzero exit code |
-| `curl` unavailable | Diagnostic error and nonzero exit code |
+| Condition                              | Expected result                        |
+| -------------------------------------- | -------------------------------------- |
+| HTTP `200`                             | Exit code `0`                          |
+| HTTP `404` or another non-200 response | Nonzero exit code                      |
+| Connection failure or timeout          | Nonzero exit code                      |
+| More than one URL argument             | Nonzero exit code                      |
+| curl unavailable                       | Diagnostic error and nonzero exit code |
 
-The script uses connection and overall request timeouts to prevent checks from hanging indefinitely.
+The script uses connection and request timeouts to prevent checks from hanging indefinitely.
 
 ### 5.3 Validation and test evidence
 
@@ -294,7 +285,7 @@ shellcheck scripts/sysinfo.sh scripts/healthcheck.sh
 echo $?
 ```
 
-**Observed result:** ShellCheck returned no diagnostics, and the exit code was `0`.
+**Observed result:** ShellCheck returned no diagnostics and the exit code was `0`.
 
 A successful application check returned:
 
@@ -303,36 +294,34 @@ Checking application: http://localhost:8080/healthz
 Success: Application returned HTTP 200.
 ```
 
-The default URL was also tested successfully.
+A failed connection returned a diagnostic and a nonzero exit code.
 
-A failed connection returned:
+A nonexistent path also returned a nonzero exit code because the endpoint returned HTTP `404` instead of the expected HTTP `200`.
 
-```text
-Checking application: http://localhost:9999/healthz
-ERROR: Request failed for http://localhost:9999/healthz (connection, timeout, or URL error).
-1
-```
-
-A nonexistent path returned:
-
-```text
-Checking application: http://localhost:8080/does-not-exist
-ERROR: Expected HTTP 200, received HTTP 404.
-1
-```
-
-These results demonstrate successful and unsuccessful health-check scenarios.
+These tests demonstrate both successful and unsuccessful health-check scenarios.
 
 ### 5.4 Executable permissions
 
-The scripts should be executable in Git:
+Both scripts are intended to have executable Git file permissions.
+
+Verify their tracked modes:
 
 ```bash
-git update-index --chmod=+x scripts/sysinfo.sh scripts/healthcheck.sh
-git diff --cached --summary
+git ls-files --stage scripts/sysinfo.sh scripts/healthcheck.sh
 ```
 
-Verify the final Git file modes show `100755` for both scripts.
+The expected mode for each script is:
+
+```text
+100755
+```
+
+If necessary, set the executable bit:
+
+```bash
+chmod +x scripts/sysinfo.sh scripts/healthcheck.sh
+git add scripts/sysinfo.sh scripts/healthcheck.sh
+```
 
 ## 6. Task 3 — Docker Containerization
 
@@ -348,10 +337,10 @@ Build a lightweight NGINX image that runs as a non-root user, serves the applica
 
 ### 6.1 Dockerfile design
 
-The Dockerfile uses the NGINX Alpine image:
+The Dockerfile uses the lightweight NGINX Alpine Slim image:
 
 ```dockerfile
-FROM nginx:1.27-alpine
+FROM nginx:1.27-alpine-slim
 
 ARG BUILD_SHA=local
 
@@ -374,7 +363,9 @@ CMD ["-g", "daemon off;"]
 
 The build argument `BUILD_SHA` is substituted into the HTML at image-build time.
 
-The image is configured to run as UID `101` and GID `101`, rather than the default root user. The custom NGINX configuration uses temporary paths under `/tmp` and writes access and error logs to standard output and standard error.
+The container runs as UID `101` and GID `101`, rather than the default root user.
+
+The custom NGINX configuration uses temporary paths under `/tmp` and sends access and error logs to standard output and standard error.
 
 ### 6.2 NGINX configuration
 
@@ -390,13 +381,13 @@ The configuration in `app/nginx.conf`:
 
 ### 6.3 Build the image
 
-Run the following command from the repository root:
+Run from the repository root:
 
 ```bash
 docker build \
   -f app/Dockerfile \
-  --build-arg BUILD_SHA=local-test-001 \
-  -t devops-intern-final:local \
+  --build-arg BUILD_SHA=local-ci-test \
+  -t devops-intern-final:ci \
   .
 ```
 
@@ -408,20 +399,13 @@ The final `.` is important because it makes the repository root the Docker build
 docker run -d \
   --name devops-nginx \
   -p 8080:8080 \
-  devops-intern-final:local
+  devops-intern-final:ci
 ```
 
 Check the container status:
 
 ```bash
 docker ps
-```
-
-The container was observed running with a healthy Docker health status:
-
-```text
-IMAGE                       STATUS                 PORTS
-devops-intern-final:local   Up ... (healthy)       0.0.0.0:8080->8080/tcp
 ```
 
 ### 6.5 Test the application
@@ -447,30 +431,44 @@ curl -i http://localhost:8080/does-not-exist
 Check the build identifier:
 
 ```bash
-curl -s http://localhost:8080/ | grep 'local-test-001'
+curl -s http://localhost:8080/ | grep 'local-ci-test'
 ```
 
-The home page should include the application title, author, assessment date, and build identifier. The health endpoint should return HTTP `200`, while the nonexistent path should return HTTP `404`.
+The home page includes the application title and build identifier.
 
-### 6.6 Verify the image
+The health endpoint returns HTTP `200`, while a nonexistent path returns HTTP `404`.
 
-Inspect image size:
+### 6.6 Image size and runtime verification
+
+The lightweight image was built and tested locally.
+
+<text> </text>
+
+**Observed local image size: 19.4 MB.**
+
+This is below the assessment requirement of 60 MB.
+
+The image used for the verified local build is:
+
+```text
+devops-intern-final:ci
+```
+
+Verify image size:
 
 ```bash
-docker images devops-intern-final:local
+docker images devops-intern-final:ci
 ```
-
-The assessment requires the image to be smaller than **60 MB**. Record the actual result here after checking it.
 
 Verify the configured runtime user:
 
 ```bash
 docker image inspect \
-  devops-intern-final:local \
+  devops-intern-final:ci \
   --format '{{.Config.User}}'
 ```
 
-Expected user:
+Expected result:
 
 ```text
 101:101
@@ -480,7 +478,7 @@ Verify the health-check configuration:
 
 ```bash
 docker image inspect \
-  devops-intern-final:local \
+  devops-intern-final:ci \
   --format '{{json .Config.Healthcheck}}'
 ```
 
@@ -506,66 +504,97 @@ docker rm devops-nginx
 
 The image can remain available locally for subsequent testing.
 
-**Evidence to record:** the actual image size, successful home-page response, `/healthz` response, non-root user, and Docker health status.
-
 ## 7. Task 4 — GitHub Actions CI/CD
 
 **Workflow file:** `.github/workflows/ci.yml`
 
 ### Objective
 
-Automate the quality checks and container build, then publish the image to GitHub Container Registry (GHCR) when changes are pushed to `main`.
+Automate quality checks and container building, then publish the image to GitHub Container Registry (GHCR) when changes are pushed to `main`.
 
-### Required jobs
+### Workflow jobs
 
-| Job | Responsibility |
-|---|---|
-| `lint` | Run ShellCheck and Hadolint |
-| `build` | Build the Docker image |
-| `test` | Run the container and verify the HTTP health endpoint |
+The GitHub Actions workflow contains the following jobs:
+
+| Job       | Responsibility                                        |
+| --------- | ----------------------------------------------------- |
+| `lint`    | Run ShellCheck and Hadolint                           |
+| `build`   | Build the Docker image                                |
+| `test`    | Start the container and verify its HTTP behavior      |
 | `publish` | Publish the image to GHCR after successful validation |
 
 ### Workflow triggers
 
-The workflow should run on:
+The workflow runs on:
 
 - Pushes to `main`.
 - Pull requests targeting `main`.
 
-Publishing should be restricted to pushes to `main`, not pull-request builds.
+The publishing job is restricted to pushes to `main`.
 
-### Container image tags
+### Container image
 
-The registry image should use the repository's GHCR path, with at least:
+The published image is available through GitHub Container Registry:
+
+[View the GHCR package](https://github.com/Taiwo17/devops-intern-final/pkgs/container/devops-intern-final)
+
+Image name:
+
+```text
+ghcr.io/taiwo17/devops-intern-final
+```
+
+The image is published with two tags:
 
 ```text
 ghcr.io/taiwo17/devops-intern-final:<commit-sha>
 ghcr.io/taiwo17/devops-intern-final:latest
 ```
 
-The actual commit SHA should be injected into the image using the `BUILD_SHA` build argument.
+The commit SHA is injected into the image using the `BUILD_SHA` build argument.
 
-### Security considerations
+### CI/CD security considerations
 
-- Grant only the GitHub token permissions needed by each job.
-- Give the publishing job `packages: write` permission.
-- Do not expose registry credentials to untrusted pull-request code.
-- Use supported, explicitly versioned GitHub Actions.
-- Publish only after the required validation jobs succeed.
+The workflow uses:
 
-### Validation
+- GitHub token permissions for the required operations.
+- Package write permission for the publishing job.
+- Publishing restricted to pushes to `main`.
+- Versioned GitHub Actions.
+- Separate validation and publishing stages.
 
-After the workflow is implemented:
+Registry credentials are not required to be committed to the repository.
 
-1. Push the feature branch.
-2. Open a pull request against `main`.
-3. Review the workflow run.
-4. Confirm that linting, image building, and tests pass.
-5. Merge the pull request.
-6. Confirm that the image is published to GHCR.
-7. Verify both the commit-SHA and `latest` tags.
+### Pipeline Architecture
 
-**Evidence to add:** the successful workflow run, pull request, and published image tags.
+The diagram below illustrates the CI/CD workflow, deployment process, and monitoring stack.
+
+![DevOps CI/CD Pipeline](docs/screenshots/pipeline.svg)
+
+### Validation results
+
+The GitHub Actions workflow completed successfully on `main`.
+
+The verified pipeline includes:
+
+- ShellCheck and Hadolint linting.
+- Docker image building.
+- Container health testing.
+- HTTP endpoint testing.
+- Build identifier verification.
+- GHCR image publishing.
+
+The image was successfully published with the `latest` tag and a commit-SHA tag.
+
+An observed published build identifier was:
+
+```text
+f51e8a08e70832675f0bda7b907c1a41f016c8f9
+```
+
+The CI workflow is available here:
+
+[View GitHub Actions workflow runs](https://github.com/Taiwo17/devops-intern-final/actions/workflows/ci.yml)
 
 ## 8. Task 5 — Nomad Deployment
 
@@ -573,18 +602,24 @@ After the workflow is implemented:
 
 ### Objective
 
-Define the NGINX application as a Nomad service using the Docker driver.
+Deploy the NGINX application as a Nomad service using the Docker driver.
 
-The job specification should include:
+### Job configuration
+
+The Nomad job specification includes:
 
 - A service job with one group and one Docker task.
 - A configurable container image and tag.
 - CPU allocation of `100 MHz`.
 - Memory allocation of `64 MB`.
 - A dynamically allocated port named `http`, mapped to container port `8080`.
-- A Consul HTTP health check for `/healthz`, with a 10-second interval and 2-second timeout.
+- A Consul HTTP health check for `/healthz`.
+- A health-check interval of 10 seconds.
+- A health-check timeout of 2 seconds.
 - Rolling-update configuration.
 - Restart and rescheduling policies.
+
+The service uses Consul for service registration and health checking.
 
 ### Validate the job
 
@@ -600,7 +635,7 @@ Inspect the deployment plan:
 nomad job plan nomad/nginx-app.nomad.hcl
 ```
 
-Submit the job when a suitable Nomad environment is running:
+Submit the job:
 
 ```bash
 nomad job run nomad/nginx-app.nomad.hcl
@@ -612,19 +647,58 @@ Check job status:
 nomad job status nginx-app
 ```
 
-Use the job name actually defined in the HCL file if it differs from `nginx-app`.
+Check allocation details:
 
-### Validation evidence
+```bash
+nomad job status -verbose nginx-app
+```
 
-Record:
+### Deployment evidence
 
-- The successful validation output.
-- The plan output.
-- The job status.
-- The allocation status.
-- Evidence that the HTTP health check is passing.
+The NGINX application was successfully deployed using Nomad.
 
-The Nomad task is not considered complete until the configuration has been validated and the deployment has been tested in a running environment.
+The observed deployment status was:
+
+| Item                  | Observed result                        |
+| --------------------- | -------------------------------------- |
+| Job                   | `nginx-app`                            |
+| Deployment status     | Successful                             |
+| Allocation status     | Running                                |
+| Healthy allocations   | 1                                      |
+| Unhealthy allocations | 0                                      |
+| Allocation ID         | `8e1cac9e-0b03-8446-53f3-c52647b67db2` |
+| Dynamic host port     | `20453`                                |
+
+The dynamic port is assigned by Nomad and can change after a redeployment.
+
+The deployed application was accessible through the allocated host port, and its `/healthz` endpoint returned HTTP `200`.
+
+### Local development environment
+
+The deployment was tested using a local Nomad development agent and a Consul development container.
+
+Start the Nomad development agent:
+
+```bash
+nomad agent -dev
+```
+
+The development agent should remain running while using the job.
+
+The Consul development container was started with:
+
+```bash
+docker run -d \
+  --name consul-dev \
+  -p 8500:8500 \
+  -p 8600:8600/udp \
+  hashicorp/consul:1.21.5 \
+  agent -dev -client=0.0.0.0 -ui
+```
+
+The local development environment is for assessment and testing, not production.
+
+**Important:** Nomad development mode uses ephemeral state. Jobs may need to be resubmitted after the development agent stops or restarts.
 
 ## 9. Task 6 — Centralized Logging and Monitoring
 
@@ -644,87 +718,133 @@ monitoring/
 
 ### Components
 
-| Component | Purpose |
-|---|---|
-| NGINX | Generates application access and error logs |
-| Promtail | Collects logs and forwards them to Loki |
-| Loki | Stores and indexes log labels for querying |
-| Grafana | Provides a user interface for log exploration |
+| Component | Purpose                                                               |
+| --------- | --------------------------------------------------------------------- |
+| NGINX     | Generates application access and error logs                           |
+| Promtail  | Discovers Docker containers, collects logs, and forwards them to Loki |
+| Loki      | Receives and stores log streams                                       |
+| Grafana   | Provides a user interface for log exploration                         |
 
-### Configuration requirements
+### Configuration
 
-The monitoring configuration should:
+The monitoring stack uses Docker Compose to run Loki, Promtail, and Grafana.
 
-- Run Loki, Promtail, and Grafana using Docker Compose.
-- Configure Loki as the log aggregation backend.
-- Configure Promtail to collect the intended Docker or Nomad logs.
-- Attach useful labels such as job, container, service, or allocation ID, depending on the collection method.
-- Document setup, access, and testing in `monitoring/loki_setup.md`.
+Promtail discovers Docker containers through the Docker socket and collects their container log files.
 
-The selected log collection configuration must match the environment being used. Docker log collection and Nomad allocation log collection may require different paths or access permissions.
+The configuration attaches useful metadata, including:
+
+- `container`
+- `service`
+
+The NGINX container deployed through Nomad is identified by a container name beginning with `nginx-`.
 
 ### Start the monitoring stack
 
-After completing the configuration, run:
+From the repository root:
 
 ```bash
 docker compose -f monitoring/docker-compose.yaml up -d
 ```
 
-Check the service status:
+Check service status:
 
 ```bash
 docker compose -f monitoring/docker-compose.yaml ps
 ```
 
-Inspect service logs if needed:
+Check Loki readiness:
+
+```bash
+curl http://localhost:3100/ready
+```
+
+Expected response:
+
+```text
+ready
+```
+
+Inspect service logs:
 
 ```bash
 docker compose -f monitoring/docker-compose.yaml logs
 ```
 
-### Generate a log entry
+### Configure Grafana
 
-Request a nonexistent path from NGINX:
+Open:
+
+[http://localhost:3000](http://localhost:3000)
+
+For the local demonstration environment, the initial credentials are:
+
+```text
+Username: admin
+Password: admin
+```
+
+Add Loki as a Grafana data source using:
+
+```text
+http://loki:3100
+```
+
+Select **Save & test** to verify the connection.
+
+### Generate a test log entry
+
+Request a nonexistent path from the active NGINX allocation:
 
 ```bash
-curl -i http://localhost:8080/does-not-exist
+curl -i http://localhost:<NOMAD_DYNAMIC_PORT>/this-page-does-not-exist
 ```
 
-This should return HTTP `404` and generate an access-log entry.
+Replace `<NOMAD_DYNAMIC_PORT>` with the current port assigned by Nomad.
 
-### Query the logs
+The request returns HTTP `404` and generates an NGINX access-log entry.
 
-Open Grafana, configure or select the Loki data source, and use Explore to query the collected NGINX logs.
+### Query NGINX logs with LogQL
 
-A query can start with:
+Open Grafana Explore and select the Loki data source.
+
+Use the following query:
 
 ```logql
-{job="nginx"}
+{container=~"nginx-.+"} |= "404"
 ```
 
-The actual label selector must match the labels defined in `promtail-config.yaml`.
+This query selects container names beginning with `nginx-` and filters log lines containing `404`.
 
-To find unsuccessful HTTP responses, use a LogQL filter appropriate to the format of the collected logs. For standard NGINX access logs, a starting example is:
+Set the time range to **Last 15 minutes** or **Last 1 hour**.
 
-```logql
-{job="nginx"} |~ "\" (4[0-9][0-9]|5[0-9][0-9]) "
+### Observed log results
+
+The query successfully returned actual NGINX log entries generated by requests to nonexistent paths.
+
+Examples included:
+
+```text
+GET /this-page-does-not-exist HTTP/1.1" 404 146
+GET /favicon.ico HTTP/1.1" 404 548
 ```
 
-This expression assumes the standard NGINX access-log format and a `job="nginx"` label. Adjust it if the configuration uses different labels or log formatting.
+The observed NGINX container label was:
 
-### Evidence to capture
+```text
+nginx-8e1cac9e-0b03-8446-53f3-c52647b67db2
+```
 
-- Monitoring services running under Docker Compose.
-- Loki configured as a Grafana data source.
-- A query displaying NGINX log entries.
-- A query showing the deliberately generated `404` response.
-- A screenshot of Grafana Explore.
-- Setup instructions in `monitoring/loki_setup.md`.
+These results confirm that Promtail collected the Docker container logs, Loki received them, and Grafana successfully queried them.
+
+### Monitoring documentation
+
+The setup and troubleshooting instructions are documented in:
+
+[`monitoring/loki_setup.md`](monitoring/loki_setup.md)
 
 ## 10. Architecture
 
-The intended deployment and monitoring flow is:
+The deployment and monitoring flow is:
 
 ```text
 Developer
@@ -751,88 +871,122 @@ Nomad Deployment
 NGINX Application
     |
     v
-Container / Application Logs
+Docker Container Logs
     |
     v
-Promtail --> Loki --> Grafana Explore
+Promtail
+    |
+    v
+Loki
+    |
+    v
+Grafana Explore
 ```
 
-The CI pipeline validates changes before publishing the container image. Nomad runs the application, while Promtail, Loki, and Grafana provide the logging and exploration path.
+The CI pipeline validates changes before publishing the container image.
+
+Nomad runs the application, while Promtail, Loki, and Grafana provide centralized log collection and exploration.
 
 ## 11. Quick Start
 
-These commands build and run the locally tested Docker application from the repository root.
+The following commands build and run the application locally from the repository root.
 
 ```bash
 git clone https://github.com/Taiwo17/devops-intern-final.git
 cd devops-intern-final
-docker build -f app/Dockerfile --build-arg BUILD_SHA=local-test-001 -t devops-intern-final:local .
-docker run -d --name devops-nginx -p 8080:8080 devops-intern-final:local
+docker build -f app/Dockerfile --build-arg BUILD_SHA=local-ci-test -t devops-intern-final:ci .
+docker run -d --name devops-nginx -p 8080:8080 devops-intern-final:ci
 curl -i http://localhost:8080/
 curl -i http://localhost:8080/healthz
 bash scripts/healthcheck.sh http://localhost:8080/healthz
 docker ps
 ```
 
-These commands assume Docker is running and the host port `8080` is available.
+These commands assume Docker is running and host port `8080` is available.
 
-The CI/CD, Nomad, and monitoring components require their corresponding configurations and environments to be completed before they can be used.
+To stop and remove the local application container:
+
+```bash
+docker stop devops-nginx
+docker rm devops-nginx
+```
+
+The CI/CD, Nomad, and monitoring components require their corresponding configurations and environments.
+
+For the monitoring setup, follow [`monitoring/loki_setup.md`](monitoring/loki_setup.md).
 
 ## 12. Testing and Validation
 
-The following results have been observed during local implementation:
+The following results were observed during implementation.
 
-| Test | Result |
-|---|---|
-| ShellCheck on both Bash scripts | Passed; exit code `0` |
-| Default application health check | Passed; HTTP `200` |
-| `/healthz` health check | Passed; HTTP `200` |
-| Connection-failure health check | Correctly failed with a nonzero exit code |
-| Nonexistent-path health check | Correctly failed on HTTP `404` |
-| Docker image build | Completed successfully |
-| Docker container startup | Container observed running |
-| Docker health status | Observed as healthy |
+| Test                            | Result                               |
+| ------------------------------- | ------------------------------------ |
+| ShellCheck on both Bash scripts | Passed; exit code `0`                |
+| Hadolint in GitHub Actions      | Passed                               |
+| Local Docker image build        | Passed                               |
+| Local image size                | 19.4 MB                              |
+| Container startup               | Passed                               |
+| Container runtime user          | UID/GID `101:101`                    |
+| Docker health check             | Healthy                              |
+| Application home page           | HTTP `200`                           |
+| `/healthz` endpoint             | HTTP `200`                           |
+| Nonexistent application path    | HTTP `404`                           |
+| Failed connection health check  | Correctly returned nonzero exit code |
+| GitHub Actions CI workflow      | Passed                               |
+| GHCR image publication          | Passed                               |
+| Nomad job deployment            | Successful                           |
+| Nomad healthy allocations       | 1                                    |
+| Loki readiness                  | Passed                               |
+| Grafana Loki data source        | Connected successfully               |
+| NGINX 404 log query             | Returned actual log entries          |
 
-The following evidence still needs to be recorded after completing the corresponding tasks:
+### Remaining release checks
 
-- Actual image size and confirmation that it is below 60 MB.
-- Hadolint result.
-- Successful GitHub Actions run and GHCR publication.
-- Nomad validation, plan, and deployment results.
-- Loki/Promtail/Grafana collection and query results.
-- Pull request merge and final release tag.
+Before final submission, verify:
 
-Only mark a test as passed after confirming its actual result.
+- Both Bash scripts have Git mode `100755`.
+- The README and screenshots are committed.
+- The final documentation changes are merged into `main`.
+- The `v1.0.0` release tag has been created and pushed.
 
 ## 13. Screenshots and Evidence
 
-Store screenshots in `docs/screenshots/` and embed them here after capturing them.
+The screenshots are stored in `docs/screenshots/`.
 
-Suggested evidence files:
+### Grafana Log Monitoring
 
-| Screenshot | Suggested filename |
-|---|---|
-| Repository structure and branches | `repository-structure.png` |
-| ShellCheck and script execution | `bash-scripts.png` |
-| Docker build and image size | `docker-build.png` |
+The following screenshots show NGINX HTTP 404 responses collected by Promtail, stored in Loki, and queried through Grafana Explore.
+
+**Screenshot 1 — Grafana NGINX 404 log results**
+
+![Grafana 404 log results - Screenshot 1](docs/screenshots/grafana-404-logs.png-1.png)
+
+**Screenshot 2 — Grafana NGINX 404 log results**
+
+![Grafana 404 log results - Screenshot 2](docs/screenshots/grafana-404-logs.png.png)
+
+### Additional evidence to capture
+
+The following screenshots can be added as further assessment evidence when available.
+
+| Evidence                           | Suggested filename         |
+| ---------------------------------- | -------------------------- |
+| Repository structure and branches  | `repository-structure.png` |
+| ShellCheck and script execution    | `bash-scripts.png`         |
+| Docker build and image size        | `docker-build.png`         |
 | HTTP health endpoint | `healthcheck.png` |
-| Successful GitHub Actions workflow | `github-actions.png` |
-| GHCR image tags | `ghcr-package.png` |
-| Nomad job status | `nomad-status.png` |
-| Grafana Explore query | `grafana-explore.png` |
-| Merged pull request | `pull-request-merged.png` |
+| Successful GitHub Actions workflow | `github-actions.png`       |
+| GHCR image tags                    | `ghcr-package.png`         |
+| Nomad job status                   | `nomad-status.png`         |
+| Merged pull request                | `pull-request-merged.png`  |
 
-Embed a screenshot using a relative path, for example:
+Embed additional screenshots using relative paths:
 
-```markdown
-![Application health check](docs/screenshots/healthcheck.png)
-```
+![NGINX Health Check](docs/screenshots/healthcheck.png)
 
-Do not add placeholder images as evidence. Capture the actual results from your environment.
+Only actual screenshots from the environment should be added as evidence.
 
 ## 14. Troubleshooting
-
-The following issues and their resolutions are relevant to the implementation. Record the exact commands and outcomes observed during your work.
 
 ### 14.1 Docker build context
 
@@ -843,10 +997,10 @@ The following issues and their resolutions are relevant to the implementation. R
 **Resolution:** Run the build from the repository root and use `.` as the context:
 
 ```bash
-docker build -f app/Dockerfile -t devops-intern-final:local .
+docker build -f app/Dockerfile -t devops-intern-final:ci .
 ```
 
-### 14.2 Incorrect `wget` output option
+### 14.2 Incorrect wget output option
 
 **Problem:** The Docker health check fails because the `wget` command uses an incorrect option.
 
@@ -865,7 +1019,7 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
 
 **Cause:** The requested path does not exist or the NGINX configuration does not match the requested URL.
 
-**Resolution:** Verify the endpoint and test it directly:
+**Resolution:** Verify the endpoint directly:
 
 ```bash
 curl -i http://localhost:8080/healthz
@@ -879,53 +1033,158 @@ The expected result is HTTP `200`.
 
 **Cause:** Another process or container is using port `8080`.
 
-**Resolution:** Inspect running containers and choose an available host port if necessary:
+**Resolution:** Inspect running containers:
 
 ```bash
 docker ps
-docker run -d --name devops-nginx -p 8081:8080 devops-intern-final:local
 ```
 
-If the host port changes to `8081`, update the URL used for host-side tests. The application still listens on port `8080` inside the container.
+Choose an available host port if necessary:
 
-Additional troubleshooting entries should be added for actual issues encountered during CI/CD, Nomad, and monitoring implementation.
+```bash
+docker run -d \
+  --name devops-nginx \
+  -p 8081:8080 \
+  devops-intern-final:ci
+```
+
+The application still listens on port `8080` inside the container. Only the host-side port changes.
+
+### 14.5 Nomad cannot reach Consul
+
+**Problem:** The Nomad-deployed service cannot register or pass its Consul health check.
+
+**Cause:** The Consul container and Nomad allocation may not be able to communicate through the expected network address.
+
+**Resolution:** Check that the Consul container is running, verify the configured service address, and test connectivity between the allocation and Consul.
+
+The local configuration uses `host.docker.internal` for the service address so that Consul can reach the dynamically mapped host port.
+
+### 14.6 Nomad job disappears after restarting the agent
+
+**Problem:** The job is no longer present after the Nomad development agent restarts.
+
+**Cause:** Nomad development mode uses ephemeral state.
+
+**Resolution:** Keep the development agent running during testing. If it restarts, validate and submit the job again:
+
+```bash
+nomad job validate nomad/nginx-app.nomad.hcl
+nomad job run nomad/nginx-app.nomad.hcl
+nomad job status nginx-app
+```
+
+### 14.7 Grafana displays no logs
+
+**Problem:** Grafana does not show the expected NGINX log entries.
+
+**Possible causes:**
+
+- Loki is not running or is not ready.
+- Promtail is not collecting Docker logs.
+- The Loki data source URL is incorrect.
+- The selected time range does not include the log entries.
+- The query uses labels that do not exist.
+
+**Resolution:**
+
+Check the monitoring services:
+
+```bash
+docker compose -f monitoring/docker-compose.yaml ps
+```
+
+Check Loki readiness:
+
+```bash
+curl http://localhost:3100/ready
+```
+
+Inspect Promtail logs:
+
+```bash
+docker compose -f monitoring/docker-compose.yaml logs promtail
+```
+
+Verify the Grafana Loki data source URL:
+
+```text
+http://loki:3100
+```
+
+Generate a fresh NGINX request and widen the Grafana time range.
+
+### 14.8 No matching 404 entries
+
+**Problem:** The Grafana query returns no matching NGINX 404 entries.
+
+**Cause:** No recent request has generated a matching log, or the query is using the wrong container label.
+
+**Resolution:** Generate a request to a nonexistent path on the active Nomad allocation:
+
+```bash
+curl -i http://localhost:<NOMAD_DYNAMIC_PORT>/this-page-does-not-exist
+```
+
+Then run:
+
+```logql
+{container=~"nginx-.+"} |= "404"
+```
+
+Use the actual dynamic port assigned by Nomad.
 
 ## 15. Limitations and Future Improvements
 
-The project is an assessment environment, not a production-ready platform.
+This project is an assessment environment, not a production-ready platform.
+
+### Current limitations
+
+- Nomad was tested using a local development agent with ephemeral state.
+- The monitoring stack uses local Docker Compose services.
+- Grafana uses default local credentials in the demonstration configuration.
+- Authentication and TLS are not configured for the local monitoring stack.
+- Promtail is configured to collect Docker container logs through the Docker socket and container log directory.
+- Persistent production-grade monitoring storage and access controls are not configured.
+
+### Future improvements
 
 Potential improvements include:
 
-- Pinning base images and third-party actions to immutable digests or commit SHAs where appropriate.
+- Pinning container images and third-party GitHub Actions to immutable digests or commit SHAs where appropriate.
 - Adding image vulnerability scanning and software bill of materials generation.
-- Using TLS and appropriate access controls for externally accessible services.
-- Managing secrets through an appropriate secret-management mechanism rather than committing credentials.
+- Using TLS and suitable access controls for externally accessible services.
+- Managing secrets through an appropriate secret-management mechanism.
 - Adding resource limits and stronger runtime security controls.
-- Defining production-ready log retention, storage, and access policies.
+- Implementing production-ready log retention and storage policies.
 - Adding automated integration tests and deployment rollback procedures.
-- Running Nomad and monitoring components in a suitably secured environment.
-
-The final implementation should document which improvements were completed and which remain future work.
+- Running Nomad and monitoring components in a secured production environment.
 
 ## 16. Assessment Status
 
-This table tracks progress and should be updated as each task is completed and verified.
+The following table summarizes the implementation and the remaining release checks.
 
-| Task | Status |
-|---|---|
-| Task 1 — Repository setup and Git workflow | In progress; final PR merge and tag remain to be verified |
-| Task 2 — Bash automation scripts | Implemented and locally tested |
-| Task 3 — Docker containerization | Built and run locally; final image-size evidence remains to be recorded |
-| Task 4 — GitHub Actions CI/CD | Pending verification |
-| Task 5 — Nomad deployment | Pending verification |
-| Task 6 — Centralized logging and monitoring | Pending verification |
-| Final README and screenshots | In progress |
-| Pull request and `v1.0.0` release tag | Pending final verification |
+| Task                                        | Status                                                 |
+| ------------------------------------------- | ------------------------------------------------------ |
+| Task 1 — Repository setup and Git workflow  | Repository created; feature branch pull request merged |
+| Task 2 — Bash automation scripts            | Implemented, tested, and ShellCheck passed             |
+| Task 3 — Docker containerization            | Built and tested; 19.4 MB local image                  |
+| Task 4 — GitHub Actions CI/CD               | Successful workflow and GHCR publication               |
+| Task 5 — Nomad deployment                   | Successfully deployed; one healthy allocation          |
+| Task 6 — Centralized logging and monitoring | Loki, Promtail, and Grafana tested; 404 logs verified  |
+| Monitoring documentation                    | Completed                                              |
+| Grafana screenshots                         | Two screenshots included                               |
+| Final README verification                   | In progress                                            |
+| Git executable-mode verification            | Final verification required                            |
+| Final documentation commit and merge        | Pending                                                |
+| `v1.0.0` release tag                        | Pending                                                |
 
 ---
 
 ## Conclusion
 
-This project demonstrates a practical DevOps workflow that starts with source control and Linux automation, continues through containerization and CI/CD, and extends to workload orchestration and centralized logging.
+This project demonstrates a practical DevOps workflow that begins with source control and Linux automation, continues through containerization and CI/CD, and extends to workload orchestration and centralized logging.
 
-The final submission will include the working configurations, actual test outputs, screenshots, troubleshooting notes, and GitHub evidence required to demonstrate the completed assessment.
+The implementation includes Bash automation, a lightweight non-root NGINX container, automated GitHub Actions validation and GHCR publishing, a successful Nomad deployment, and centralized log collection and querying through Loki, Promtail, and Grafana.
+
+The final submission brings together the working configurations, observed test results, screenshots, troubleshooting notes, and GitHub evidence required to demonstrate the assessment.
