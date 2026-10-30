@@ -1,0 +1,77 @@
+
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="700" viewBox="0 0 1200 700">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#64748b"/>
+    </marker>
+    <style>
+      .node { fill: #f8fafc; stroke: #0f766e; stroke-width: 2; rx: 12; }
+      .title { font: bold 19px Arial, sans-serif; fill: #0f172a; text-anchor: middle; }
+      .subtitle { font: 14px Arial, sans-serif; fill: #475569; text-anchor: middle; }
+      .arrow { stroke: #64748b; stroke-width: 2.5; fill: none; marker-end: url(#arrow); }
+      .heading { font: bold 27px Arial, sans-serif; fill: #0f172a; text-anchor: middle; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="700" fill="#ffffff"/>
+  <text x="600" y="45" class="heading">DevOps Intern Final Assessment Pipeline</text>
+
+  <rect x="60" y="100" width="220" height="85" class="node"/>
+  <text x="170" y="135" class="title">Developer</text>
+  <text x="170" y="160" class="subtitle">Code changes</text>
+
+  <rect x="370" y="100" width="220" height="85" class="node"/>
+  <text x="480" y="135" class="title">GitHub</text>
+  <text x="480" y="160" class="subtitle">Repository / Pull Request</text>
+
+  <rect x="680" y="100" width="220" height="85" class="node"/>
+  <text x="790" y="135" class="title">GitHub Actions</text>
+  <text x="790" y="160" class="subtitle">CI workflow</text>
+
+  <rect x="990" y="100" width="160" height="85" class="node"/>
+  <text x="1070" y="135" class="title">Validation</text>
+  <text x="1070" y="160" class="subtitle">ShellCheck / Hadolint</text>
+
+  <path d="M280 142 H365" class="arrow"/>
+  <path d="M590 142 H675" class="arrow"/>
+  <path d="M900 142 H985" class="arrow"/>
+
+  <rect x="680" y="280" width="220" height="85" class="node"/>
+  <text x="790" y="315" class="title">Docker</text>
+  <text x="790" y="340" class="subtitle">Build and test image</text>
+
+  <rect x="370" y="280" width="220" height="85" class="node"/>
+  <text x="480" y="315" class="title">GHCR</text>
+  <text x="480" y="340" class="subtitle">Container registry</text>
+
+  <rect x="60" y="280" width="220" height="85" class="node"/>
+  <text x="170" y="315" class="title">Nomad</text>
+  <text x="170" y="340" class="subtitle">Workload deployment</text>
+
+  <path d="M1070 185 V230 H790 V275" class="arrow"/>
+  <path d="M680 322 H595" class="arrow"/>
+  <path d="M370 322 H285" class="arrow"/>
+
+  <rect x="60" y="475" width="220" height="85" class="node"/>
+  <text x="170" y="510" class="title">NGINX</text>
+  <text x="170" y="535" class="subtitle">Application / Health check</text>
+
+  <rect x="370" y="475" width="220" height="85" class="node"/>
+  <text x="480" y="510" class="title">Promtail</text>
+  <text x="480" y="535" class="subtitle">Log collection</text>
+
+  <rect x="680" y="475" width="220" height="85" class="node"/>
+  <text x="790" y="510" class="title">Loki</text>
+  <text x="790" y="535" class="subtitle">Log aggregation</text>
+
+  <rect x="990" y="475" width="160" height="85" class="node"/>
+  <text x="1070" y="510" class="title">Grafana</text>
+  <text x="1070" y="535" class="subtitle">Log visualization</text>
+
+  <path d="M170 365 V470" class="arrow"/>
+  <path d="M280 517 H365" class="arrow"/>
+  <path d="M590 517 H675" class="arrow"/>
+  <path d="M900 517 H985" class="arrow"/>
+
+  <text x="600" y="630" class="subtitle">Consul provides service registration and discovery for the Nomad deployment.</text>
+</svg>
