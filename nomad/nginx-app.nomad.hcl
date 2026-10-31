@@ -11,7 +11,7 @@ job "nginx-app" {
   update {
     max_parallel      = 1
     min_healthy_time  = "10s"
-    healthy_deadline  = "3m"
+    healthy_deadline  = "2m"
     progress_deadline = "10m"
     auto_revert       = true
   }
